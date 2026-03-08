@@ -3,6 +3,7 @@ package com.seveneleven.bookmystayapp.main;
 import java.util.Scanner;
 
 import com.seveneleven.bookmystayapp.room.services.InventoryService;
+import com.seveneleven.bookmystayapp.room.services.SearchService;
 
 /**
  * Main Entry point of the BookMyStayApp 
@@ -13,6 +14,7 @@ import com.seveneleven.bookmystayapp.room.services.InventoryService;
 public class BookMyStayApp {
 	
 	public static final InventoryService inventoryService= InventoryService.getInstance();
+	public static final SearchService searchService = SearchService.getInstance();
 	public static final Scanner scanner = new Scanner(System.in);
 	
 	/**
@@ -103,6 +105,43 @@ public class BookMyStayApp {
 	}
 	
 	/**
+	 * Method to handle the guest menu flow
+	 */
+	public static void handleGuestFlow() {
+		boolean inGuestMenu = true;
+
+		while(inGuestMenu) {
+			System.out.println("\n---- Guest Panel (Search Service) ----");
+			System.out.println("1. View All Available Rooms");
+			System.out.println("2. Search Specific Room Availability");
+			System.out.println("0. Exit");
+			System.out.print("Enter your choice: ");
+			String choice = scanner.nextLine();
+
+			inGuestMenu = switch (choice) {
+				case "1" -> {
+					searchService.displayAvailableRooms();
+					yield true;
+				}
+				case "2" -> {
+					System.out.print("Enter room type to search: ");
+					String type = scanner.nextLine().toLowerCase();
+					searchService.checkAvailability(type); 
+					yield true;
+				}
+				case "0" -> {
+					System.out.println("Exiting to main menu!");
+					yield false;
+				}
+				default -> {
+					System.out.println("Invalid Choice");
+					yield true;
+				}
+			};
+		}
+	}
+	
+	/**
 	 * Main method which acts as a runner for the app
 	 * 
 	 * @param args	Command-Line Arguments
@@ -125,7 +164,7 @@ public class BookMyStayApp {
 					yield true;
 				}
 				case "2" -> {
-					System.out.println("User flow will be added here");
+					handleGuestFlow();
 					yield true;
 				}
 				case "0" -> {

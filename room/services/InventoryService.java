@@ -2,6 +2,7 @@ package com.seveneleven.bookmystayapp.room.services;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class manages the hotel inventory
@@ -74,7 +75,7 @@ public class InventoryService {
 	 * @param count	The new count of that room type
 	 */
 	public void updateCount(String type, int count) {
-		if(!types.contains(type)) {
+		if(!roomExists(type)) {
 			System.out.println("The entered room type does not exist!");
 			return;
 		}
@@ -94,7 +95,7 @@ public class InventoryService {
 	 * @param price	The new price of that room
 	 */
 	public void updatePrice(String type, double price) {
-		if(!types.contains(type)) {
+		if(!roomExists(type)) {
 			System.out.println("The entered room type does not exist!");
 			return;
 		}
@@ -120,4 +121,42 @@ public class InventoryService {
 		System.out.println("-------------------------------------------");
 	}
 	
+	/**
+	 * Method to check if a room type exists
+	 * 
+	 * @param type	The type of the room that is to be checked
+	 * @return	True if the type exists else false
+	 */
+	public boolean roomExists(String type) {
+		return types.contains(type);
+	}
+	
+	/**
+	 * Method to get all available room types
+	 * 
+	 * @return	A set od all available room types
+	 */
+	public Set<String> getAllRoomTypes(){
+		return this.types;
+	}
+	
+	/**
+	 * Method to get the count of a specified room type
+	 * 
+	 * @param type	The type who's count is required
+	 * @return	The count of the specified type
+	 */
+	public int getAvailableCount(String type) {
+		return countMap.getOrDefault(type, 0);
+	}
+	
+	/**
+	 * Method to get the price of a specified room type
+	 * 
+	 * @param type	The type of the room who's price is required
+	 * @return	The price of the specified room type
+	 */
+	public double getPrice(String type) {
+		return priceMap.getOrDefault(type, 0.0);
+	}
 }
