@@ -14,7 +14,7 @@ import com.seveneleven.bookmystayapp.room.services.SearchService;
  * Main Entry point of the BookMyStayApp 
  * 
  * @author Developer
- * @version 4.0
+ * @version 5.0
  */
 public class BookMyStayApp {
 
