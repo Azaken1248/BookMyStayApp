@@ -4,11 +4,20 @@ import java.util.Scanner;
 
 import com.seveneleven.bookmystayapp.room.services.InventoryService;
 
+/**
+ * Main Entry point of the BookMyStayApp 
+ * 
+ * @author Developer
+ * @version 1.0
+ */
 public class BookMyStayApp {
 	
 	public static final InventoryService inventoryService= InventoryService.getInstance();
 	public static final Scanner scanner = new Scanner(System.in);
 	
+	/**
+	 * Method to handle admin panel flow
+	 */
 	public static void handleAdminFlow() {
 		
 		boolean inAdminMenu = true;
@@ -93,6 +102,11 @@ public class BookMyStayApp {
 		}
 	}
 	
+	/**
+	 * Main method which acts as a runner for the app
+	 * 
+	 * @param args	Command-Line Arguments
+	 */
 	public static void main(String[]args) {
 		
 		boolean inMainMenu = true;
