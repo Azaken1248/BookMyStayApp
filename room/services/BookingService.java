@@ -76,4 +76,25 @@ public class BookingService {
     public boolean isValidReservation(String reservationId) {
     	return bookedRoomIds.contains(reservationId);
     }
+    
+    /**
+     * Method to release a booked room
+     * 
+     * @param roomId	The ID of the room to be released
+     * @return	True on successful release else false
+     */
+    public boolean releaseRoom(String roomId) {
+        if (!bookedRoomIds.contains(roomId)) return false;
+        
+        bookedRoomIds.remove(roomId);
+        String type = roomId.split("-")[0].toLowerCase();
+        if (roomAllocations.containsKey(type)) {
+            roomAllocations.get(type).remove(roomId);
+        }
+        
+        int currentCount = inventoryService.getAvailableCount(type);
+        inventoryService.updateCount(type, currentCount + 1);
+        return true;
+    }
+
 }
