@@ -66,4 +66,14 @@ public class BookingService {
         
         return uniqueRoomId;
     }
+    
+    /**
+     * Method to check if a reservation ID is valid
+     * 
+     * @param reservationId The ID to be checked
+     * @return	True if the reservation ID is valid else false
+     */
+    public boolean isValidReservation(String reservationId) {
+    	return bookedRoomIds.contains(reservationId);
+    }
 }
