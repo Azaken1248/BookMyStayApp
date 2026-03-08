@@ -2,6 +2,8 @@ package com.seveneleven.bookmystayapp.main;
 
 import java.util.Scanner;
 
+import com.seveneleven.bookmystayapp.addon.AddOn;
+import com.seveneleven.bookmystayapp.addon.services.AddOnService;
 import com.seveneleven.bookmystayapp.reservation.Reservation;
 import com.seveneleven.bookmystayapp.room.services.BookingQueueService;
 import com.seveneleven.bookmystayapp.room.services.BookingService;
@@ -20,6 +22,7 @@ public class BookMyStayApp {
 	public static final SearchService searchService = SearchService.getInstance();
 	public static final BookingQueueService bookingQueueService = BookingQueueService.getInstance();
 	public static final BookingService bookingService = BookingService.getInstance();
+	public static final AddOnService addOnService = AddOnService.getInstance();
 	public static final Scanner scanner = new Scanner(System.in);
 
 	/**
@@ -145,7 +148,8 @@ public class BookMyStayApp {
 			System.out.println("\n---- Guest Panel ----");
 			System.out.println("1. View All Available Rooms");
 			System.out.println("2. Search Specific Room Availability");
-			System.out.println("3. Request a Room Booking"); // New option
+			System.out.println("3. Request a Room Booking");
+			System.out.println("4. Add Extra Services");
 			System.out.println("0. Exit");
 			System.out.print("Enter your choice: ");
 			String choice = scanner.nextLine();
@@ -169,12 +173,43 @@ public class BookMyStayApp {
 				System.out.print("Enter room type to book: ");
 				String type = scanner.nextLine().toLowerCase();
 
-				// Basic validation: Check if room type exists before queueing
 				if(searchService.checkAvailability(type)) {
 					Reservation newReservation = new Reservation(guestName, type);
 					bookingQueueService.addBookingRequest(newReservation);
 				} else {
 					System.out.println("Booking request aborted due to unavailability.");
+				}
+				yield true;
+			}
+			case "4" -> {
+				System.out.println("---- Add Services to Booking ----");
+				System.out.print("Enter your assigned Reservation/Room ID (e.g., DELUXE-1): ");
+				String reservationId = scanner.nextLine().toUpperCase();
+				
+				if(!bookingService.isValidReservation(reservationId)) {
+					System.out.println("Invalid Reservation ID. Please check with the admin.");
+					yield true;
+				}
+				
+				boolean addingServices = true;
+				while(addingServices) {
+					addOnService.displayAvailableServices();
+					System.out.println("0. Done / View Summary");
+					System.out.print("Select a service to add: ");
+					int serviceChoice = scanner.nextInt();
+					scanner.nextLine();
+					if(serviceChoice == 0) {
+						addOnService.displayBillSummary(reservationId);
+						addingServices = false;
+					} else {
+						AddOn selectedService = addOnService.getServiceByIndex(serviceChoice - 1);
+						
+						if(selectedService != null) {
+							addOnService.addServiceToReservation(reservationId, selectedService);
+						} else {
+							System.out.println("Invalid selection.");
+						}
+					}
 				}
 				yield true;
 			}
