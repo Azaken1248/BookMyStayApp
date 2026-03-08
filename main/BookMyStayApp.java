@@ -2,6 +2,8 @@ package com.seveneleven.bookmystayapp.main;
 
 import java.util.Scanner;
 
+import com.seveneleven.bookmystayapp.reservation.Reservation;
+import com.seveneleven.bookmystayapp.room.services.BookingQueueService;
 import com.seveneleven.bookmystayapp.room.services.InventoryService;
 import com.seveneleven.bookmystayapp.room.services.SearchService;
 
@@ -15,6 +17,7 @@ public class BookMyStayApp {
 	
 	public static final InventoryService inventoryService= InventoryService.getInstance();
 	public static final SearchService searchService = SearchService.getInstance();
+	public static final BookingQueueService bookingQueueService = BookingQueueService.getInstance();
 	public static final Scanner scanner = new Scanner(System.in);
 	
 	/**
@@ -111,9 +114,10 @@ public class BookMyStayApp {
 		boolean inGuestMenu = true;
 
 		while(inGuestMenu) {
-			System.out.println("\n---- Guest Panel (Search Service) ----");
+			System.out.println("\n---- Guest Panel ----");
 			System.out.println("1. View All Available Rooms");
 			System.out.println("2. Search Specific Room Availability");
+			System.out.println("3. Request a Room Booking"); // New option
 			System.out.println("0. Exit");
 			System.out.print("Enter your choice: ");
 			String choice = scanner.nextLine();
@@ -126,7 +130,24 @@ public class BookMyStayApp {
 				case "2" -> {
 					System.out.print("Enter room type to search: ");
 					String type = scanner.nextLine().toLowerCase();
-					searchService.checkAvailability(type); 
+					searchService.checkAvailability(type);
+					yield true;
+				}
+				case "3" -> {
+					System.out.println("---- Book a Room ----");
+					System.out.print("Enter your name: ");
+					String guestName = scanner.nextLine();
+					
+					System.out.print("Enter room type to book: ");
+					String type = scanner.nextLine().toLowerCase();
+					
+					// Basic validation: Check if room type exists before queueing
+					if(searchService.checkAvailability(type)) {
+						Reservation newReservation = new Reservation(guestName, type);
+						bookingQueueService.addBookingRequest(newReservation);
+					} else {
+						System.out.println("Booking request aborted due to unavailability.");
+					}
 					yield true;
 				}
 				case "0" -> {
