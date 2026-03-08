@@ -61,6 +61,15 @@ public class BookingQueueService {
         return bookingQueue;
     }
     
+    /**
+     * Method to process the request
+     * 
+     * @return	The request that has been processed
+     */
+    public Reservation processNextRequest() {
+    	return bookingQueue.poll();
+    }
+    
     /**'
      * Check if the queue is empty
      * 
