@@ -8,13 +8,14 @@ import com.seveneleven.bookmystayapp.reservation.Reservation;
 import com.seveneleven.bookmystayapp.room.services.BookingQueueService;
 import com.seveneleven.bookmystayapp.room.services.BookingService;
 import com.seveneleven.bookmystayapp.room.services.InventoryService;
+import com.seveneleven.bookmystayapp.room.services.ReportingService;
 import com.seveneleven.bookmystayapp.room.services.SearchService;
 
 /**
  * Main Entry point of the BookMyStayApp 
  * 
  * @author Developer
- * @version 4.0
+ * @version 6.0
  */
 public class BookMyStayApp {
 
@@ -23,6 +24,7 @@ public class BookMyStayApp {
 	public static final BookingQueueService bookingQueueService = BookingQueueService.getInstance();
 	public static final BookingService bookingService = BookingService.getInstance();
 	public static final AddOnService addOnService = AddOnService.getInstance();
+	public static final ReportingService reportingService = ReportingService.getInstance();
 	public static final Scanner scanner = new Scanner(System.in);
 
 	/**
@@ -39,6 +41,8 @@ public class BookMyStayApp {
 			System.out.println("3. Update Count");
 			System.out.println("4. Display Inventory");
 			System.out.println("5. Process Bookings");
+			System.out.println("6. Generate Booking History Report");
+			System.out.println("7. Cancel Booking");
 			System.out.println("0. Exit");
 			System.out.print("Enter your choice: ");
 			String choice = scanner.nextLine();
@@ -101,31 +105,43 @@ public class BookMyStayApp {
 			}
 			case "5" -> {
 				System.out.println("---- Process Booking ----");
-
 				if(bookingQueueService.isQueueEmpty()) {
 					System.out.println("The queue is empty. No pending booking requests!");
 					yield true;
 				}
-
+				
 				Reservation currentRequest = bookingQueueService.processNextRequest();
 				String requestedType = currentRequest.getRoomType();
-
-				System.out.printf("Processing request: Guest [%s] for Room [%s]...\n", 
-						currentRequest.getGuestName(), requestedType);
-
 				String allocatedRoomId = bookingService.allocateRoom(requestedType);
-
+				
 				if(allocatedRoomId != null) {
-					System.out.printf("Result: Booking APPROVED! Room ID [%s] allocated to %s.\n", 
+					currentRequest.setReservationId(allocatedRoomId);
+					reportingService.addConfirmedBooking(currentRequest);
+					
+					System.out.printf("Result: APPROVED! Room ID [%s] allocated to %s.\n", 
 							allocatedRoomId, currentRequest.getGuestName());
 				} else {
-					System.out.println("Result: Booking REJECTED! Sorry, this room type is sold out.");
+					System.out.println("Result: REJECTED! Sorry, this room type is sold out.");
 				}
-
-				System.out.printf("Remaining people in queue: %d\n", bookingQueueService.getBookingQueue().size());
 				yield true;
 			}
-			case "0" -> {
+			
+			case "6" -> {
+				reportingService.generateReport();
+				yield true;
+			}
+			
+			case "7" -> {
+				System.out.println("---- Cancel Booking ----");
+				System.out.print("Enter Reservation ID to cancel: ");
+				String cancelId = scanner.nextLine().toUpperCase();
+				
+				if(reportingService.cancelBooking(cancelId)) {
+					bookingService.releaseRoom(cancelId);
+					System.out.println("Inventory updated: Room returned to available pool.");
+				}
+				yield true;
+			}			case "0" -> {
 				System.out.println("Exiting to main menu!");
 				yield false;
 			}
@@ -150,6 +166,7 @@ public class BookMyStayApp {
 			System.out.println("2. Search Specific Room Availability");
 			System.out.println("3. Request a Room Booking");
 			System.out.println("4. Add Extra Services");
+			System.out.println("5. Cancel Booking");
 			System.out.println("0. Exit");
 			System.out.print("Enter your choice: ");
 			String choice = scanner.nextLine();
@@ -210,6 +227,17 @@ public class BookMyStayApp {
 							System.out.println("Invalid selection.");
 						}
 					}
+				}
+				yield true;
+			}
+			case "5" -> {
+				System.out.println("---- Cancel Booking ----");
+				System.out.print("Enter Reservation ID to cancel: ");
+				String cancelId = scanner.nextLine().toUpperCase();
+				
+				if(reportingService.cancelBooking(cancelId)) {
+					bookingService.releaseRoom(cancelId);
+					System.out.println("Inventory updated: Room returned to available pool.");
 				}
 				yield true;
 			}
