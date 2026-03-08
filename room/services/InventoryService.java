@@ -3,6 +3,9 @@ package com.seveneleven.bookmystayapp.room.services;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/**
+ * This class manages the hotel inventory
+ */
 public class InventoryService {
 	private HashMap<String, Integer> countMap;
 	private HashMap<String, Double> priceMap;
